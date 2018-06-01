@@ -44,7 +44,9 @@ func Summarize(stats []*Stats) {
 		fail += s.fail
 		elapsed += s.elapsed
 	}
-	avg = elapsed / time.Duration(success)
+	if (success + fail) > 0 {
+		avg = elapsed / time.Duration(success+fail)
+	}
 
 	log.Info("\t\t\tSummary:")
 	log.Info("\t\t\tmax:\t", max)
@@ -80,13 +82,13 @@ func Request(ctx context.Context, rawurl string, data []string,
 				if elapsed < stats.Min {
 					stats.Min = elapsed
 				}
+				stats.elapsed += elapsed
 
 				if err != nil {
 					log.Error(err, elapsed)
 					stats.fail++
 				} else {
 					log.Info(elapsed)
-					stats.elapsed += elapsed
 					stats.success++
 				}
 			}
