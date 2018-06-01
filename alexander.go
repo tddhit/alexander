@@ -16,41 +16,43 @@ const (
 )
 
 type Stats struct {
-	max     int64
-	Min     int64
-	avg     int64
+	max     time.Duration
+	Min     time.Duration
+	avg     time.Duration
+	elapsed time.Duration
 	success int64
 	fail    int64
-	elapsed int64
 }
 
 func Summarize(stats []*Stats) {
 	var (
-		max     int64
-		min     int64 = int64(MAX_TIME_DURATION)
-		avg     int64
+		max     time.Duration
+		min     time.Duration = MAX_TIME_DURATION
+		avg     time.Duration
+		elapsed time.Duration
 		success int64
 		fail    int64
-		elapsed int64
 	)
 	for _, s := range stats {
 		if s.max > max {
 			max = s.max
-		} else if s.Min < min {
+		}
+		if s.Min < min {
 			min = s.Min
 		}
 		success += s.success
 		fail += s.fail
 		elapsed += s.elapsed
 	}
-	avg = elapsed / success
+	avg = elapsed / time.Duration(success)
 
 	log.Info("\t\t\tSummary:")
-	log.Infof("\t\t\tmax:\t%dms", max/1000000)
-	log.Infof("\t\t\tmin:\t%dms", min/1000000)
-	log.Infof("\t\t\tavg:\t%dms", avg/1000000)
-	log.Infof("\t\t\tfail:\t%d", fail)
-	log.Infof("\t\t\tsucc:\t%d", success)
+	log.Info("\t\t\tmax:\t", max)
+	log.Info("\t\t\tmin:\t", min)
+	log.Info("\t\t\tavg:\t", avg)
+	log.Info("\t\t\ttotal:\t", elapsed)
+	log.Info("\t\t\tsucc:\t", success)
+	log.Info("\t\t\tfail:\t", fail)
 }
 
 func Request(ctx context.Context, rawurl string, data []string,
@@ -72,10 +74,11 @@ func Request(ctx context.Context, rawurl string, data []string,
 				end := time.Now()
 				elapsed := end.Sub(start)
 
-				if int64(elapsed) > stats.max {
-					stats.max = int64(elapsed)
-				} else if int64(elapsed) < stats.Min {
-					stats.Min = int64(elapsed)
+				if elapsed > stats.max {
+					stats.max = elapsed
+				}
+				if elapsed < stats.Min {
+					stats.Min = elapsed
 				}
 
 				if err != nil {
@@ -83,7 +86,7 @@ func Request(ctx context.Context, rawurl string, data []string,
 					stats.fail++
 				} else {
 					log.Info(elapsed)
-					stats.elapsed += int64(elapsed)
+					stats.elapsed += elapsed
 					stats.success++
 				}
 			}

@@ -59,7 +59,7 @@ func main() {
 	wg.Add(concurrency)
 	for i := 0; i < concurrency; i++ {
 		s := &alexander.Stats{
-			Min: int64(alexander.MAX_TIME_DURATION),
+			Min: alexander.MAX_TIME_DURATION,
 		}
 		stats = append(stats, s)
 		go func(s *alexander.Stats) {
