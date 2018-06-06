@@ -17,6 +17,7 @@ import (
 var (
 	url            string
 	postFile       string
+	host           string
 	repeatTimes    int
 	concurrency    int
 	connectTimeout int
@@ -26,6 +27,7 @@ var (
 func init() {
 	flag.StringVar(&url, "url", "", "url")
 	flag.StringVar(&postFile, "p", "", "post file")
+	flag.StringVar(&host, "h", "", "host header")
 	flag.IntVar(&repeatTimes, "n", 1, "repeat n times")
 	flag.IntVar(&concurrency, "c", 1, "concurrency")
 	flag.IntVar(&connectTimeout, "ct", 1000, "connect timeout")
@@ -48,7 +50,7 @@ func main() {
 		MaxIdleConns:    10,
 	}
 	header := make(http.Header)
-	header.Add("Content-Type", "application/json")
+	header.Add("Host", host)
 
 	var (
 		stats       []*alexander.Stats
