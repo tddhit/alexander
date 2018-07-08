@@ -66,6 +66,9 @@ func (c *client) Request(method, path string, header http.Header, body []byte) (
 		return
 	}
 	req.Header = header
+	if host := req.Header.Get("Host"); host != "" {
+		req.Host = host
+	}
 	if rsp, err = c.Do(req); err != nil {
 		return
 	}
