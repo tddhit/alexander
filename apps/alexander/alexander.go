@@ -58,6 +58,7 @@ func main() {
 		ctx, cancel = context.WithCancel(context.Background())
 	)
 
+	start := time.Now()
 	wg.Add(concurrency)
 	for i := 0; i < concurrency; i++ {
 		s := &alexander.Stats{
@@ -82,5 +83,6 @@ func main() {
 	}()
 
 	wg.Wait()
-	alexander.Summarize(stats)
+	end := time.Now()
+	alexander.Summarize(concurrency, end.Sub(start), stats)
 }

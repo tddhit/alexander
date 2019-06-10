@@ -24,7 +24,7 @@ type Stats struct {
 	fail    int64
 }
 
-func Summarize(stats []*Stats) {
+func Summarize(concurrency int, total time.Duration, stats []*Stats) {
 	var (
 		max     time.Duration
 		min     time.Duration = MAX_TIME_DURATION
@@ -55,6 +55,7 @@ func Summarize(stats []*Stats) {
 	log.Info("\t\t\ttotal:\t", elapsed)
 	log.Info("\t\t\tsucc:\t", success)
 	log.Info("\t\t\tfail:\t", fail)
+	log.Info("\t\t\tqps:\t", float64(concurrency)/float64(avg/time.Millisecond)*1000)
 }
 
 func Request(ctx context.Context, rawurl string, data []string,
@@ -72,7 +73,7 @@ func Request(ctx context.Context, rawurl string, data []string,
 				goto exit
 			default:
 				start := time.Now()
-				_, err := c.Request("POST", url.Path, header, []byte(data[j]))
+				_, err := c.Request("POST", rawurl, header, []byte(data[j]))
 				end := time.Now()
 				elapsed := end.Sub(start)
 
@@ -88,7 +89,7 @@ func Request(ctx context.Context, rawurl string, data []string,
 					log.Error(err, elapsed)
 					stats.fail++
 				} else {
-					log.Info(elapsed)
+					//log.Info(elapsed)
 					stats.success++
 				}
 			}

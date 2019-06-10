@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -51,7 +50,7 @@ func NewClient(opt Option, addr string) *client {
 	return c
 }
 
-func (c *client) Request(method, path string, header http.Header, body []byte) (rspBody []byte, err error) {
+func (c *client) Request(method, url string, header http.Header, body []byte) (rspBody []byte, err error) {
 	if method != "POST" {
 		err = errUnsupportedMethod
 		return
@@ -61,7 +60,6 @@ func (c *client) Request(method, path string, header http.Header, body []byte) (
 		rsp *http.Response
 	)
 	bodyBytes := bytes.NewReader(body)
-	url := fmt.Sprintf("http://%s%s", c.addr, path)
 	if req, err = http.NewRequest(method, url, bodyBytes); err != nil {
 		return
 	}
